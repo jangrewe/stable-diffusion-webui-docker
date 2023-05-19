@@ -10,19 +10,17 @@ RUN apt-get -qq update -y \
  && rm -rf /var/lib/apt/lists/*
 
 RUN git clone --depth 1 --branch v${VERSION} -c advice.detachedHead=false \
-    https://github.com/AUTOMATIC1111/stable-diffusion-webui.git /stable-diffusion-webui
+    https://github.com/AUTOMATIC1111/stable-diffusion-webui.git /app
 
-WORKDIR /stable-diffusion-webui
-VOLUME /stable-diffusion-webui/models/VAE-approx
+WORKDIR /app
 
 ENV PIP_ROOT_USER_ACTION=ignore
-RUN sed -i -e 's/    start()/    #start()/g' /stable-diffusion-webui/launch.py \
+RUN sed -i -e 's/    start()/    #start()/g' /app/launch.py \
  && python launch.py --skip-torch-cuda-test \
- && sed -i -e 's/    #start()/    start()/g' /stable-diffusion-webui/launch.py
-
+ && sed -i -e 's/    #start()/    start()/g' /app/launch.py
 RUN rm -r /root/.cache/pip
 
 EXPOSE 7860
 
-ENTRYPOINT ["python", "webui.py", "--listen", "--disable-console-progressbars", "--enable-insecure-extension-access"]
+ENTRYPOINT ["python", "launch.py", "--listen", "--data-dir", "/app/data", "--disable-console-progressbars", "--enable-insecure-extension-access"]
 CMD ["--api", "--opt-sdp-no-mem-attention", "--opt-channelslast"]
