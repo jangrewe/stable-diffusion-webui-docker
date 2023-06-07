@@ -1,7 +1,7 @@
 FROM nvidia/cuda:11.8.0-base-ubuntu22.04
 
 ARG VERSION
-ENV VERSION=1.2.1
+ENV VERSION=1.3.2
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -qq update -y \
@@ -14,11 +14,11 @@ RUN git clone --depth 1 --branch v${VERSION} -c advice.detachedHead=false \
 
 WORKDIR /app
 
+ENV PIP_NO_CACHE_DIR=true
 ENV PIP_ROOT_USER_ACTION=ignore
 RUN sed -i -e 's/    start()/    #start()/g' /app/launch.py \
  && python launch.py --skip-torch-cuda-test \
  && sed -i -e 's/    #start()/    start()/g' /app/launch.py
-RUN rm -r /root/.cache/pip
 
 EXPOSE 7860
 
